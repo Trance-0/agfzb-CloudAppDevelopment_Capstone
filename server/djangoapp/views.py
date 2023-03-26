@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
+from .restapis import get_dealer_reviews_from_cf,get_dealers_from_cf,get_request
 import logging
 import json
 
@@ -94,14 +95,34 @@ def registration_request(request):
 def get_dealerships(request):
     context = {}
     if request.method == "GET":
+        url = "your-cloud-function-domain/dealerships/dealer-get"
+        # Get dealers from the URL
+        dealerships = get_dealers_from_cf(url)
+        # Concat all dealer's short name
+        context.update("dealerships",dealerships)
+        # Return a list of dealer short name
         return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
-# def get_dealer_details(request, dealer_id):
+def get_dealer_details(request, dealer_id):
+    context={}
+    url = "your-cloud-function-domain/dealerships/dealer-get"
+    reviews=get_dealer_reviews_from_cf(url)
+    context.update("reviews",reviews)
+    render(request, 'djangoapp/dealer_details.html', context)
 # ...
 
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
+def add_review(request, dealer_id):
+    if request.method=="GET":
+        context={}
+        context.update("dealer_id",dealer_id)
+        render(request, 'djangoapp/add_review.html', context)
+    if request.method=="POST":
+        json_payload["review"]
+        datetime.utcnow().isoformat()
+        car.year.strftime("%Y")
+        redirect("djangoapp:dealer_details", dealer_id=dealer_id)
 # ...
 
